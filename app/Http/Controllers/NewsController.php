@@ -13,7 +13,7 @@ class NewsController extends Controller
 
         if ($cond_title != '') {
             // タイトルで記事を検索し、該当するものを取得
-            $posts = News::where('title', $cond_title).orderBy('updated_at', 'desc')->get();
+            $posts = News::where('title', $cond_title)->orderBy('updated_at', 'desc')->get();
         } else {
             // 新規投稿順に並び替える
             $posts = News::all()->sortByDesc('updated_at');
