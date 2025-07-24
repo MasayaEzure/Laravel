@@ -13,8 +13,9 @@ class News extends Model
     ];
 
     public static $rules = array(
-        'title' => 'required',
-        'body' => 'required',
+        'title' => 'required|max:250',
+        'body' => 'required|max:10000',
+        'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:20480', // 20MB
     );
 
     // Newsモデルのリレーションを設定

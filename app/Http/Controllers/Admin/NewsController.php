@@ -27,7 +27,30 @@ class NewsController extends Controller
 
         // 画像が添付されたらパスに画像を保存する
         if (isset($form['image'])) {
-            $path = $request->file('image')->store('public/image');
+            $image = $request->file('image');
+            
+            // ファイル検証
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $maxFileSize = 20 * 1024 * 1024; // 20MB
+            
+            // 拡張子チェック
+            $extension = strtolower($image->getClientOriginalExtension());
+            if (!in_array($extension, $allowedExtensions)) {
+                return back()->withErrors(['image' => '許可されていないファイル形式です。JPG, PNG, GIF, WEBPのみ可能です。']);
+            }
+            
+            // MIMEタイプチェック
+            if (!in_array($image->getMimeType(), $allowedMimeTypes)) {
+                return back()->withErrors(['image' => '不正なファイル形式です。']);
+            }
+            
+            // ファイルサイズチェック
+            if ($image->getSize() > $maxFileSize) {
+                return back()->withErrors(['image' => 'ファイルサイズが大きすぎます。20MB以下にしてください。']);
+            }
+            
+            $path = $image->store('public/image');
             $news->image_path = basename($path);
         } else {
             $news->image_path = null;
@@ -87,9 +110,32 @@ class NewsController extends Controller
 
         // 添付された画像の処理
         if ($request->input('remove')) {
-            $news_form['imgage_path'] = null;
+            $news_form['image_path'] = null;
         } elseif ($request->file('image')) {
-            $path = $request->file('image')->store('public/image');
+            $image = $request->file('image');
+            
+            // ファイル検証
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $maxFileSize = 20 * 1024 * 1024; // 20MB
+            
+            // 拡張子チェック
+            $extension = strtolower($image->getClientOriginalExtension());
+            if (!in_array($extension, $allowedExtensions)) {
+                return back()->withErrors(['image' => '許可されていないファイル形式です。JPG, PNG, GIF, WEBPのみ可能です。']);
+            }
+            
+            // MIMEタイプチェック
+            if (!in_array($image->getMimeType(), $allowedMimeTypes)) {
+                return back()->withErrors(['image' => '不正なファイル形式です。']);
+            }
+            
+            // ファイルサイズチェック
+            if ($image->getSize() > $maxFileSize) {
+                return back()->withErrors(['image' => 'ファイルサイズが大きすぎます。20MB以下にしてください。']);
+            }
+            
+            $path = $image->store('public/image');
             $news_form['image_path'] = basename($path);
         } else {
             $news_form['image_path'] = $news->image_path;
