@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class News extends Model
 {
-    protected $guarded = array('id');
+    protected $fillable = [
+        'title',
+        'body',
+        'image_path'
+    ];
 
     public static $rules = array(
         'title' => 'required',
