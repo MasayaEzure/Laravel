@@ -20,8 +20,8 @@ Route::get('/', function () {
 
 Route::group([
     'prefix' => 'admin',
-    // ログイン画面にリダイレクトされるよう設定 
-    'middleware' => 'auth'
+    // 管理者認証を要求する設定
+    'middleware' => ['auth', 'admin']
 ], 
 function()
 {
