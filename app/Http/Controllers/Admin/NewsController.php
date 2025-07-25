@@ -70,11 +70,16 @@ class NewsController extends Controller
     // ニュース一覧を表示するためのアクション
     public function index(Request $request)
     {
+        // 検索入力の検証
+        $request->validate([
+            'cond_title' => 'nullable|string|max:255|regex:/^[\p{L}\p{N}\s\-_]+$/u'
+        ]);
+        
         // Viewで検索されたタイトルを代入
         $cond_title = $request->cond_title;
         if ($cond_title != '') {
-            // 検索されたタイトルと一致するレコードを取得する
-            $posts = News::where('title', $cond_title)->get();
+            // 検索されたタイトルと一致するレコードを取得する（LIKEクエリに変更）
+            $posts = News::where('title', 'LIKE', '%' . $cond_title . '%')->get();
         } else {
             // 全てのニュースを取得
             $posts = News::all();

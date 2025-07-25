@@ -33,10 +33,15 @@ class ProfileController extends Controller
     // プロフィール一覧を表示させるアクション
     public function show(Request $request)
     {
+        // 検索入力の検証
+        $request->validate([
+            'cond_name' => 'nullable|string|max:255|regex:/^[\p{L}\p{N}\s\-_]+$/u'
+        ]);
+        
         $cond_name = $request->cond_name;
         if ($cond_name != '') {
-            // 名前を検索したら一致するレコードを取得
-            $posts_profile = Profile::where('name', $cond_name)->get();
+            // 名前を検索したら一致するレコードを取得（LIKEクエリに変更）
+            $posts_profile = Profile::where('name', 'LIKE', '%' . $cond_name . '%')->get();
         } else {
             // 全てのプロフィールを取得
             $posts_profile = Profile::all();
