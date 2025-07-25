@@ -50,18 +50,34 @@ class ProfileController extends Controller
 
     public function edit(Request $request)
     {
+        // 管理者権限とIDの妥当性を確認
+        if (!$request->id || !is_numeric($request->id)) {
+            abort(400, 'Invalid ID parameter');
+        }
+        
         $profile = Profile::find($request->id);
         if (empty($profile)) {
-            abort(404);
+            abort(404, 'Profile record not found');
         }
+        
         return view('admin.profile.edit', ['profile_form' => $profile]);
     }
 
     public function update(Request $request)
     {
+        // IDの妥当性を確認
+        $id = $request->input('id');
+        if (!$id || !is_numeric($id)) {
+            abort(400, 'Invalid ID parameter');
+        }
+        
         $this->validate($request, Profile::$rules_profile);
 
-        $profile = Profile::find($request->input('id'));
+        $profile = Profile::find($id);
+        
+        if (!$profile) {
+            abort(404, 'Profile record not found');
+        }
         $profile_form = $request->all();
         unset($profile_form['_token']);
 
@@ -77,7 +93,17 @@ class ProfileController extends Controller
 
     public function delete(Request $request)
     {
+        // IDの妥当性を確認
+        if (!$request->id || !is_numeric($request->id)) {
+            abort(400, 'Invalid ID parameter');
+        }
+        
         $profile = Profile::find($request->id);
+        
+        if (!$profile) {
+            abort(404, 'Profile record not found');
+        }
+        
         $profile->delete();
 
         return redirect('admin/profile');

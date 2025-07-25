@@ -24,4 +24,21 @@ class Profile extends Model
     {
         return $this->hasMany('App\Models\History_profile');
     }
+
+    // 管理者権限チェック用スコープ
+    public function scopeAdminAccessible($query)
+    {
+        // 管理者は全レコードにアクセス可能
+        return $query;
+    }
+    
+    // IDの妥当性チェック
+    public static function findOrFailSecure($id)
+    {
+        if (!$id || !is_numeric($id) || $id <= 0) {
+            abort(400, 'Invalid ID parameter');
+        }
+        
+        return static::findOrFail($id);
+    }
 }
