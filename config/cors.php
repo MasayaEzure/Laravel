@@ -17,13 +17,13 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => env('CORS_ALLOWED_METHODS') ? explode(',', env('CORS_ALLOWED_METHODS')) : ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => env('CORS_ALLOWED_ORIGINS') ? explode(',', env('CORS_ALLOWED_ORIGINS')) : (env('APP_ENV') === 'production' ? [] : ['*']),
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => env('CORS_ALLOWED_ORIGINS_PATTERNS') ? explode(',', env('CORS_ALLOWED_ORIGINS_PATTERNS')) : [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => env('CORS_ALLOWED_HEADERS') ? explode(',', env('CORS_ALLOWED_HEADERS')) : ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-TOKEN'],
 
     'exposed_headers' => [],
 
