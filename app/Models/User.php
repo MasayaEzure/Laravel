@@ -39,5 +39,19 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
     ];
+
+    // 管理者権限安全設定メソッド
+    public function makeAdmin()
+    {
+        $this->is_admin = true;
+        return $this->save();
+    }
+
+    public function removeAdmin()
+    {
+        $this->is_admin = false;
+        return $this->save();
+    }
 }

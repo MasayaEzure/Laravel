@@ -33,10 +33,15 @@ class ProfileController extends Controller
     // プロフィール一覧を表示させるアクション
     public function show(Request $request)
     {
+        // 検索入力の検証
+        $request->validate([
+            'cond_name' => 'nullable|string|max:255|regex:/^[\p{L}\p{N}\s\-_]+$/u'
+        ]);
+        
         $cond_name = $request->cond_name;
         if ($cond_name != '') {
-            // 名前を検索したら一致するレコードを取得
-            $posts_profile = Profile::where('name', $cond_name)->get();
+            // 名前を検索したら一致するレコードを取得（LIKEクエリに変更）
+            $posts_profile = Profile::where('name', 'LIKE', '%' . $cond_name . '%')->get();
         } else {
             // 全てのプロフィールを取得
             $posts_profile = Profile::all();
@@ -50,18 +55,34 @@ class ProfileController extends Controller
 
     public function edit(Request $request)
     {
+        // 管理者権限とIDの妥当性を確認
+        if (!$request->id || !is_numeric($request->id)) {
+            abort(400, 'Invalid ID parameter');
+        }
+        
         $profile = Profile::find($request->id);
         if (empty($profile)) {
-            abort(404);
+            abort(404, 'Profile record not found');
         }
+        
         return view('admin.profile.edit', ['profile_form' => $profile]);
     }
 
     public function update(Request $request)
     {
+        // IDの妥当性を確認
+        $id = $request->input('id');
+        if (!$id || !is_numeric($id)) {
+            abort(400, 'Invalid ID parameter');
+        }
+        
         $this->validate($request, Profile::$rules_profile);
 
-        $profile = Profile::find($request->input('id'));
+        $profile = Profile::find($id);
+        
+        if (!$profile) {
+            abort(404, 'Profile record not found');
+        }
         $profile_form = $request->all();
         unset($profile_form['_token']);
 
@@ -77,7 +98,17 @@ class ProfileController extends Controller
 
     public function delete(Request $request)
     {
+        // IDの妥当性を確認
+        if (!$request->id || !is_numeric($request->id)) {
+            abort(400, 'Invalid ID parameter');
+        }
+        
         $profile = Profile::find($request->id);
+        
+        if (!$profile) {
+            abort(404, 'Profile record not found');
+        }
+        
         $profile->delete();
 
         return redirect('admin/profile');

@@ -20,8 +20,8 @@ Route::get('/', function () {
 
 Route::group([
     'prefix' => 'admin',
-    // ログイン画面にリダイレクトされるよう設定 
-    'middleware' => 'auth'
+    // 管理者認証を要求する設定
+    'middleware' => ['auth', 'admin']
 ], 
 function()
 {
@@ -31,16 +31,20 @@ function()
     Route::get('news', 'App\Http\Controllers\Admin\NewsController@index');
     Route::get('news/edit', 'App\Http\Controllers\Admin\NewsController@edit');
     Route::post('news/edit', 'App\Http\Controllers\Admin\NewsController@update');
-    Route::get('news/delete', 'App\Http\Controllers\Admin\NewsController@delete');
+    Route::delete('news/delete', 'App\Http\Controllers\Admin\NewsController@delete');
 
     Route::get('profile/create', 'App\Http\Controllers\Admin\ProfileController@add');
     Route::post('profile/create', 'App\Http\Controllers\Admin\ProfileController@create');
     Route::get('profile', 'App\Http\Controllers\Admin\ProfileController@show');
     Route::get('profile/edit', 'App\Http\Controllers\Admin\ProfileController@edit');
     Route::post('profile/edit', 'App\Http\Controllers\Admin\ProfileController@update');
-    Route::get('profile/delete', 'App\Http\Controllers\Admin\ProfileController@delete');
+    Route::delete('profile/delete', 'App\Http\Controllers\Admin\ProfileController@delete');
 });
-Auth::routes();
+// レート制限付き認証ルート
+Auth::routes(['verify' => true]);
+
+// ログインのレート制限を追加
+Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->middleware('throttle:5,1');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

@@ -9,11 +9,16 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
+        // 検索入力の検証
+        $request->validate([
+            'cond_title' => 'nullable|string|max:255|regex:/^[\p{L}\p{N}\s\-_]+$/u'
+        ]);
+        
         $cond_title = $request->cond_title;
 
         if ($cond_title != '') {
-            // タイトルで記事を検索し、該当するものを取得
-            $posts = News::where('title', $cond_title).orderBy('updated_at', 'desc')->get();
+            // タイトルで記事を検索し、該当するものを取得（LIKEクエリに変更）
+            $posts = News::where('title', 'LIKE', '%' . $cond_title . '%')->orderBy('updated_at', 'desc')->get();
         } else {
             // 新規投稿順に並び替える
             $posts = News::all()->sortByDesc('updated_at');
